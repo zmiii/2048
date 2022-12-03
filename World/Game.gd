@@ -16,7 +16,8 @@ func _ready():
 func _process(delta):
 	input_check()
 	
-	show_maps()
+	if $BackGround/Panel/Debug.visible:
+		show_maps()
 
 func input_check():
 	if Input.is_action_just_pressed("ui_up"):
@@ -30,6 +31,9 @@ func input_check():
 	
 	if Input.is_action_just_pressed("ui_home"):
 		$BackGround/Panel/Debug.visible = !$BackGround/Panel/Debug.visible
+
+func map_check():
+	pass
 
 func calculate(var dire):
 	#根据方向确定正序遍历还是反序
@@ -47,11 +51,9 @@ func calculate(var dire):
 			if new_map_point == Vector2(row,col):
 				continue
 			var block = find_block(Vector2(row,col))
-			if block == null:
-				var v = 1
 			block_move(block,new_map_point)
 	#检测是否胜负
-	
+	map_check()
 	#移动完成后创建一个新块
 	create_block(2,rand_block())
 
@@ -74,6 +76,8 @@ func move(var row,var col,var dire:Vector2):
 	elif map[row + dire.x][col + dire.y] == map[row][col]:
 		map[row + dire.x][col + dire.y] += map[row][col]
 		map[row][col] = 0
+		#合并获得积分
+		$GameController.score = String(map[row + dire.x][col + dire.y] + int($GameController.score))
 		return Vector2(row + dire.x,col + dire.y)
 	#如果下一块不同则不移动
 	return Vector2(row,col)
@@ -85,12 +89,10 @@ func block_move(var block,var point : Vector2):
 	var target_block = find_block(point)
 	#如果没有目标块则移动，否则移动后销毁对象
 	if target_block == null:
-#		create_tween().tween_property(block,"position",target,0.1)
 		block.move(target)
 		block.point = point
 	else:
 		#不知道为什么，SceneTreeTween在ready初始化后没有使用，process中过三个func就无效了，第四个func就报错提示null，看不懂，但大受震撼
-#		yield(create_tween().tween_property(block,"position",target,0.1), "finished")
 		block.move(target)
 		target_block.number = block.number * 2
 		target_block.point = point
@@ -125,13 +127,13 @@ func rand_block():
 #因为下标与坐标相反，所以需要交替计算
 func map_inpot_to_position(var vec:Vector2):
 	var pos = Vector2()
-	pos.x = vec.y * 128 + 8
-	pos.y = vec.x * 128 + 8
+	pos.x = vec.y * 128 + 8 + 60
+	pos.y = vec.x * 128 + 8 + 60
 	return pos
 
 #生成背景block
 func create_block_backgournd():
-	var block_position = Vector2(8,8)
+	var block_position = Vector2(68,68)
 	for	_row in range(1,5,1):
 		for	_col in range(1,5,1):
 			var block = block_sence.instance()
@@ -141,7 +143,7 @@ func create_block_backgournd():
 			block_position.y += 128
 		#生成第二行背景需要重新设定position
 		block_position.x += 128
-		block_position.y = 8
+		block_position.y = 68
 
 #根据下标生成块
 func create_block(var num,var vec:Vector2):
@@ -161,6 +163,8 @@ func _on_NewGame_button_down() -> void:
 	restart()
 
 
+func _on_GameController_score_changed(score) -> void:
+	$BackGround/Score/Content.text = score
 
 
 
@@ -174,3 +178,7 @@ func show_maps():
 		for col in range(0,4,1):
 			$BackGround/Panel/Debug/MapArray.text += String(map[row][col])
 		$BackGround/Panel/Debug/MapArray.text += "\n"
+
+
+
+

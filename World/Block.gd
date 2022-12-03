@@ -20,6 +20,10 @@ func number_set(value):
 	#但很显然我对唯一化的理解和使用有问题，而且，这游戏既不需要多高的性能，这么写也不一定消耗多少性能
 	$Background.remove_stylebox_override("panel")
 	var styleboxflat = StyleBoxFlat.new()
+	styleboxflat.corner_radius_top_left = 5
+	styleboxflat.corner_radius_top_right = 5
+	styleboxflat.corner_radius_bottom_left = 5
+	styleboxflat.corner_radius_bottom_right = 5
 	styleboxflat.bg_color = BlockModel.bgColor[number]
 	$Background.add_stylebox_override("panel",styleboxflat)
 	
@@ -39,10 +43,17 @@ func move(var target:Vector2):
 	$Tween.start()
 
 #更改分数和新建时从小变大的效果
+#虽然新建时也会进入setter，但不知道为什么无效
 func show():
+	$Tween.interpolate_property(self, "scale",
+		self.scale, Vector2(0.8,0.8), 0.1,
+		Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	$Tween.start()
+	yield($Tween,"tween_completed")
 	$Tween.interpolate_property(self, "scale",
 		self.scale, Vector2(1.3,1.3), 0.2,
 		Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	$Tween.start()
 	yield($Tween,"tween_completed")
 	$Tween.interpolate_property(self, "scale",
 		self.scale, Vector2(1,1), 0.2,
