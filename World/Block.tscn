@@ -11,7 +11,7 @@ corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
-[sub_resource type="DynamicFont" id=4]
+[sub_resource type="DynamicFont" id=6]
 size = 80
 font_data = ExtResource( 2 )
 
@@ -36,7 +36,7 @@ margin_right = 60.0
 margin_bottom = 55.0
 custom_colors/font_color = Color( 0.466667, 0.431373, 0.396078, 1 )
 custom_colors/font_color_shadow = Color( 0.466667, 0.431373, 0.396078, 1 )
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 6 )
 text = "2"
 align = 1
 valign = 1

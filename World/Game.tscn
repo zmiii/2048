@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://GameController.tscn" type="PackedScene" id=1]
 [ext_resource path="res://World/Game.gd" type="Script" id=2]
@@ -19,7 +19,7 @@ size = 70
 font_data = ExtResource( 3 )
 
 [sub_resource type="DynamicFont" id=10]
-size = 43
+size = 40
 font_data = ExtResource( 3 )
 
 [sub_resource type="DynamicFont" id=3]
@@ -49,6 +49,17 @@ corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id=11]
+bg_color = Color( 1, 1, 1, 0.498039 )
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="DynamicFont" id=12]
+size = 68
+font_data = ExtResource( 3 )
 
 [node name="Game" type="Node2D"]
 script = ExtResource( 2 )
@@ -87,15 +98,42 @@ custom_colors/font_color = Color( 0, 0, 0, 1 )
 custom_fonts/font = SubResource( 9 )
 text = "text"
 
-[node name="Button" type="Button" parent="BackGround/Panel/Debug"]
-margin_left = -685.0
-margin_top = -177.0
-margin_right = -399.0
-margin_bottom = -34.0
+[node name="CreateBlockButton" type="Button" parent="BackGround/Panel/Debug"]
+margin_left = 610.0
+margin_top = -156.0
+margin_right = 776.0
+margin_bottom = -31.0
 mouse_default_cursor_shape = 2
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_fonts/font = SubResource( 10 )
 text = "创建块"
+
+[node name="CreateTestMapButton" type="Button" parent="BackGround/Panel/Debug"]
+margin_left = 602.0
+margin_top = -4.0
+margin_right = 796.0
+margin_bottom = 120.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 10 )
+text = "创建地图"
+
+[node name="CreateWinMapButton" type="Button" parent="BackGround/Panel/Debug"]
+margin_left = 609.0
+margin_top = 142.0
+margin_right = 789.0
+margin_bottom = 265.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 10 )
+text = "1204*2"
+
+[node name="ShowDialogButton" type="Button" parent="BackGround/Panel/Debug"]
+margin_left = 612.0
+margin_top = 303.0
+margin_right = 824.0
+margin_bottom = 414.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 10 )
+text = "显示提示框"
 
 [node name="Label" type="Label" parent="BackGround"]
 anchor_right = 0.506
@@ -122,9 +160,9 @@ valign = 1
 
 [node name="Label3" type="Label" parent="BackGround"]
 margin_left = 1792.0
-margin_top = 2326.0
+margin_top = 2336.0
 margin_right = 2308.0
-margin_bottom = 2404.0
+margin_bottom = 2414.0
 custom_colors/font_color = Color( 0.466667, 0.431373, 0.396078, 1 )
 custom_fonts/font = SubResource( 4 )
 text = "如何玩: 用你的方向键 移动方块。当两个具有相同数字的方块接触时，它们会合并为一个！数字到达2048即为胜利~"
@@ -182,6 +220,40 @@ position = Vector2( 1788, 1788 )
 [node name="Blocks" type="Node2D" parent="."]
 position = Vector2( 1788, 1788 )
 
+[node name="GameOver" type="Panel" parent="."]
+visible = false
+margin_left = 1788.0
+margin_top = 1788.0
+margin_right = 2308.0
+margin_bottom = 2308.0
+custom_styles/panel = SubResource( 11 )
+
+[node name="Label" type="Label" parent="GameOver"]
+margin_top = 150.0
+margin_right = 520.0
+margin_bottom = 263.0
+custom_colors/font_color = Color( 0.466667, 0.431373, 0.396078, 1 )
+custom_colors/font_color_shadow = Color( 0.466667, 0.431373, 0.396078, 1 )
+custom_fonts/font = SubResource( 12 )
+text = "游戏结束"
+align = 1
+valign = 1
+
+[node name="Button" type="Button" parent="GameOver"]
+margin_left = 195.0
+margin_top = 318.0
+margin_right = 325.0
+margin_bottom = 368.0
+custom_colors/font_color = Color( 0.976471, 0.964706, 0.94902, 1 )
+custom_fonts/font = SubResource( 8 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/normal = SubResource( 7 )
+text = "新游戏"
+
 [connection signal="score_changed" from="GameController" to="." method="_on_GameController_score_changed"]
-[connection signal="button_down" from="BackGround/Panel/Debug/Button" to="." method="_on_Button_button_down"]
+[connection signal="button_down" from="BackGround/Panel/Debug/CreateBlockButton" to="." method="_on_Button_button_down"]
+[connection signal="button_down" from="BackGround/Panel/Debug/CreateTestMapButton" to="." method="_on_CreateTestMapButton_button_down"]
+[connection signal="button_down" from="BackGround/Panel/Debug/CreateWinMapButton" to="." method="_on_CreateWinMapButton_button_down"]
+[connection signal="button_down" from="BackGround/Panel/Debug/ShowDialogButton" to="." method="_on_ShowDialogButton_button_down"]
 [connection signal="button_down" from="BackGround/NewGame" to="." method="_on_NewGame_button_down"]
+[connection signal="button_down" from="GameOver/Button" to="." method="_on_NewGame_button_down"]

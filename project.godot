@@ -20,8 +20,8 @@ BlockModel="*res://World/BlockModel.gd"
 
 [display]
 
-window/size/width=1980
-window/size/height=1200
+window/size/width=1400
+window/size/height=900
 window/dpi/allow_hidpi=true
 
 [gui]

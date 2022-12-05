@@ -5,6 +5,9 @@ onready var block_sence = preload("res://World/Block.tscn")
 
 var map = []
 
+#游戏是否已经结束
+var game_over = false
+
 func _ready():
 	#设置随机数种子
 	randomize()
@@ -14,7 +17,8 @@ func _ready():
 	create_map()
 	
 func _process(delta):
-	input_check()
+	if !game_over:
+		input_check()
 	
 	if $BackGround/Panel/Debug.visible:
 		show_maps()
@@ -31,9 +35,6 @@ func input_check():
 	
 	if Input.is_action_just_pressed("ui_home"):
 		$BackGround/Panel/Debug.visible = !$BackGround/Panel/Debug.visible
-
-func map_check():
-	pass
 
 func calculate(var dire):
 	#根据方向确定正序遍历还是反序
@@ -53,7 +54,9 @@ func calculate(var dire):
 			var block = find_block(Vector2(row,col))
 			block_move(block,new_map_point)
 	#检测是否胜负
-	map_check()
+	#如果返回false则不可以继续游玩
+	if !map_check():
+		return
 	#移动完成后创建一个新块
 	create_block(2,rand_block())
 
@@ -61,10 +64,8 @@ func move(var row,var col,var dire:Vector2):
 	#如果当前为0则跳过 
 	if map[row][col] == 0:
 		return null
-	#如果下一块超出数组则跳过当前块，即如果当前为边缘块则返回下标
-	elif row + dire.x < 0 or col + dire.y < 0:
-		return Vector2(row,col)
-	elif  row + dire.x >= len(map) or col + dire.y >= len(map[row]):
+	#如果下一块超出数组则返回下标
+	elif row + dire.x < 0 or col + dire.y < 0 or row + dire.x >= len(map) or col + dire.y >= len(map[row]):
 		return Vector2(row,col)
 	#如果下一块为0则移动过去
 	elif map[row + dire.x][col + dire.y] == 0:
@@ -84,19 +85,63 @@ func move(var row,var col,var dire:Vector2):
 
 #将目标块移动指指定下标对应位置位置
 func block_move(var block,var point : Vector2):
+	if block == null:
+		print(block)
 	#转换下标为坐标
 	var target = map_inpot_to_position(point)
 	var target_block = find_block(point)
 	#如果没有目标块则移动，否则移动后销毁对象
 	if target_block == null:
+#		yield(block.move(target),"completed")
 		block.move(target)
 		block.point = point
 	else:
 		#不知道为什么，SceneTreeTween在ready初始化后没有使用，process中过三个func就无效了，第四个func就报错提示null，看不懂，但大受震撼
+#		yield(block.move(target),"completed")
 		block.move(target)
 		target_block.number = block.number * 2
 		target_block.point = point
 		block.free()
+
+#检查地图是否还能继续游玩
+func map_check():
+	var zero_count = 0
+	#优先检查一次是胜利或者还能继续
+	for row in range(0,4,1):
+		for col in range(0,4,1):
+			if map[row][col] == 2048:
+				$GameOver.visible = true
+				game_over = true
+				return false
+			elif map[row][col] == 0:
+				zero_count += 1
+	if zero_count > 0:
+		return zero_count
+	
+	#既没有胜利，也没有一个空格了，则检查是否失败
+	for row in range(0,4,1):
+		for col in range(0,4,1):
+			if !map_contrast(row,col):
+				$GameOver.visible = true
+				game_over = true
+				return false
+			else:
+				return true
+	
+	
+
+#地图节点对比查看四个方向是否有相邻且相同的块
+func map_contrast(var row,var col):
+	for dire in BlockModel.blockDirection.values():
+		#如果下一块超出数组则检查下一个方向
+		if row + dire.x < 0 or col + dire.y < 0 or row + dire.x >= len(map) or col + dire.y >= len(map[row]):
+			continue
+		elif map[row + dire.x][col + dire.y] == map[row][col]:
+			#下一个方块如果相同则游戏继续
+			return true
+	return false
+
+
 
 func create_map():
 	#初始化二维数组
@@ -111,6 +156,9 @@ func restart():
 	for block in $Blocks.get_children():
 		block.queue_free()
 	create_map()
+	$GameController.score = "0"
+	game_over = false
+	$GameOver.visible = false
 
 #根据下标查询块
 func find_block(var point:Vector2):
@@ -145,7 +193,7 @@ func create_block_backgournd():
 		block_position.x += 128
 		block_position.y = 68
 
-#根据下标生成块
+#根据下标生成块！需注意确保地图仍有空余
 func create_block(var num,var vec:Vector2):
 	while map[vec.x][vec.y] != 0:
 		vec = rand_block()
@@ -169,16 +217,41 @@ func _on_GameController_score_changed(score) -> void:
 
 
 #test
-func _on_Button_button_down() -> void:
-	create_block(2,rand_block())
-
+#显示地图数组
 func show_maps():
 	$BackGround/Panel/Debug/MapArray.text = ""
 	for row in range(0,4,1):
 		for col in range(0,4,1):
-			$BackGround/Panel/Debug/MapArray.text += String(map[row][col])
+			$BackGround/Panel/Debug/MapArray.text += String(map[row][col]) + "  "
 		$BackGround/Panel/Debug/MapArray.text += "\n"
+		
+#创建一个块
+func _on_Button_button_down() -> void:
+	for row in range(0,4,1):
+		for col in range(0,4,1):
+			if map[row][col] == 0:
+				create_block(2,rand_block())
+				return
+#创建测试地图和块
+func _on_CreateTestMapButton_button_down() -> void:
+	var count = 0
+	for row in range(0,4,1):
+		for col in range(0,4,1):
+			if map[row][col] == 0:
+				count += 1
+	while count > 0:
+		create_block(2,rand_block())
+		count -= 1
+		
+#创建即将胜利的块
+func _on_CreateWinMapButton_button_down() -> void:
+	create_block(1024,Vector2(0,0))
+	create_block(1024,Vector2(0,1))
+	for i in [0,1]:
+		create_block(256,rand_block())
+	for i in [0,1]:
+		create_block(1024,rand_block())
 
 
-
-
+func _on_ShowDialogButton_button_down() -> void:
+	$GameOver.visible = !$GameOver.visible

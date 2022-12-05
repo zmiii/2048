@@ -27,13 +27,19 @@ func number_set(value):
 	styleboxflat.bg_color = BlockModel.bgColor[number]
 	$Background.add_stylebox_override("panel",styleboxflat)
 	
-	$Number.get_font("font").size = BlockModel.numSize[number]
+	var d_font = DynamicFont.new()
+	var d_font_data = DynamicFontData.new()
+	d_font_data.font_path = "res://Fonts/MSYHMONO.ttf"
+	d_font.size = BlockModel.numSize[number]
+	d_font.font_data = d_font_data
+	$Number.remove_font_override("font")
+	$Number.add_font_override("font",d_font)
+
 	if number > 4:
-		var fc = $Number.get_color("font_color")
-		var fcs = $Number.get_color("font_color_shadow")
-		fc = BlockModel.numColor["white"]
-		fcs = BlockModel.numColor["white"]
-		
+		$Number.remove_color_override("font_color")
+		$Number.remove_color_override("font_color_shadow")
+		$Number.add_color_override("font_color",BlockModel.numColor["white"])
+		$Number.add_color_override("font_color_shadow",BlockModel.numColor["white"])
 	show()
 
 func move(var target:Vector2):
@@ -41,6 +47,7 @@ func move(var target:Vector2):
 		self.position, target, 0.1,
 		Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	$Tween.start()
+	yield(get_tree(),"idle_frame")
 
 #更改分数和新建时从小变大的效果
 #虽然新建时也会进入setter，但不知道为什么无效
