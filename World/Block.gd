@@ -4,6 +4,8 @@ extends Node2D
 var number = 0 setget number_set
 #坐标
 var point = Vector2(0,0)
+#是否已合并过
+var has_merge = false
 
 func _ready():
 	pass

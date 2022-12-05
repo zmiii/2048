@@ -57,6 +57,9 @@ func calculate(var dire):
 	#如果返回false则不可以继续游玩
 	if !map_check():
 		return
+	#可以继续游玩则重置块合并状态
+	for block in $Blocks.get_children():
+		block.has_merge = false
 	#移动完成后创建一个新块
 	create_block(2,rand_block())
 
@@ -73,14 +76,18 @@ func move(var row,var col,var dire:Vector2):
 		map[row][col] = 0
 		var end_point = move(row + dire.x,col + dire.y,dire)
 		return end_point
-	#如果下一块相同则合并
+	#如果下一块相同则合并\并且本次移动没有合并过
 	elif map[row + dire.x][col + dire.y] == map[row][col]:
-		map[row + dire.x][col + dire.y] += map[row][col]
-		map[row][col] = 0
-		#合并获得积分
-		$GameController.score = String(map[row + dire.x][col + dire.y] + int($GameController.score))
-		return Vector2(row + dire.x,col + dire.y)
-	#如果下一块不同则不移动
+		#由于需要更改bolck状态，所以分离判断条件
+		var block = find_block(Vector2(row + dire.x,col + dire.y))
+		if !block.has_merge:
+			map[row + dire.x][col + dire.y] += map[row][col]
+			map[row][col] = 0
+			block.has_merge = true
+			#合并获得积分
+			$GameController.score = String(map[row + dire.x][col + dire.y] + int($GameController.score))
+			return Vector2(row + dire.x,col + dire.y)
+	#如果下一块不同或者已经合并过则不移动
 	return Vector2(row,col)
 
 #将目标块移动指指定下标对应位置位置
