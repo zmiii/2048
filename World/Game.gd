@@ -7,6 +7,8 @@ var map = []
 
 #游戏是否已经结束
 var game_over = false
+#是否有块移动过
+var has_move_block = false
 
 func _ready():
 	#设置随机数种子
@@ -37,6 +39,8 @@ func input_check():
 		$BackGround/Panel/Debug.visible = !$BackGround/Panel/Debug.visible
 
 func calculate(var dire):
+	#重置移动指示器
+	has_move_block = false
 	#根据方向确定正序遍历还是反序
 	var for_array = []
 	if dire == BlockModel.blockDirection["UP"] or dire == BlockModel.blockDirection["LEFT"]:
@@ -53,6 +57,10 @@ func calculate(var dire):
 				continue
 			var block = find_block(Vector2(row,col))
 			block_move(block,new_map_point)
+			has_move_block = true
+	#如果没有块移动跳过剩余计算且不生成块
+	if !has_move_block:
+		return
 	#检测是否胜负
 	#如果返回false则不可以继续游玩
 	if !map_check():
@@ -112,6 +120,7 @@ func block_move(var block,var point : Vector2):
 
 #检查地图是否还能继续游玩
 func map_check():
+	#空余块计数器
 	var zero_count = 0
 	#优先检查一次是胜利或者还能继续
 	for row in range(0,4,1):
@@ -125,7 +134,7 @@ func map_check():
 	if zero_count > 0:
 		return zero_count
 	
-	#既没有胜利，也没有一个空格了，则检查是否失败
+	#满屏且没有胜利，则检查是否失败，未失败则继续游戏且不生成块
 	for row in range(0,4,1):
 		for col in range(0,4,1):
 			if !map_contrast(row,col):
@@ -134,8 +143,6 @@ func map_check():
 				return false
 			else:
 				return true
-	
-	
 
 #地图节点对比查看四个方向是否有相邻且相同的块
 func map_contrast(var row,var col):
@@ -144,7 +151,7 @@ func map_contrast(var row,var col):
 		if row + dire.x < 0 or col + dire.y < 0 or row + dire.x >= len(map) or col + dire.y >= len(map[row]):
 			continue
 		elif map[row + dire.x][col + dire.y] == map[row][col]:
-			#下一个方块如果相同则游戏继续
+			#如果相邻方块有相同则游戏继续
 			return true
 	return false
 
@@ -241,13 +248,15 @@ func _on_Button_button_down() -> void:
 				return
 #创建测试地图和块
 func _on_CreateTestMapButton_button_down() -> void:
+	var numbers = [2,4,8,16,32,64,128,256]
+	
 	var count = 0
 	for row in range(0,4,1):
 		for col in range(0,4,1):
 			if map[row][col] == 0:
 				count += 1
 	while count > 0:
-		create_block(2,rand_block())
+		create_block(numbers[randi() % 7],rand_block())
 		count -= 1
 		
 #创建即将胜利的块
