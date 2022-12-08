@@ -34,7 +34,7 @@ func input_check():
 		calculate(BlockModel.blockDirection["LEFT"])
 	elif Input.is_action_just_pressed("ui_right"):
 		calculate(BlockModel.blockDirection["RIGHT"])
-	
+
 	if Input.is_action_just_pressed("ui_home"):
 		$BackGround/Panel/Debug.visible = !$BackGround/Panel/Debug.visible
 
@@ -112,7 +112,7 @@ func block_move(var block,var point : Vector2):
 		block.point = point
 	else:
 		#不知道为什么，SceneTreeTween在ready初始化后没有使用，process中过三个func就无效了，第四个func就报错提示null，看不懂，但大受震撼
-#		yield(block.move(target),"completed")
+		#查了一下，SceneTreeTween会自动释放，所以，为什么每次都用create_tween还是偶发性报错，离谱
 		block.move(target)
 		target_block.number = block.number * 2
 		target_block.point = point
@@ -154,8 +154,6 @@ func map_contrast(var row,var col):
 			#如果相邻方块有相同则游戏继续
 			return true
 	return false
-
-
 
 func create_map():
 	#初始化二维数组
@@ -214,12 +212,10 @@ func create_block(var num,var vec:Vector2):
 	map[vec.x][vec.y] = num
 	var pos = map_inpot_to_position(vec)
 	var block = block_sence.instance()
+	$Blocks.add_child(block)
 	block.position = pos
 	block.point = vec
 	block.number = num
-	
-	$Blocks.add_child(block)
-
 
 func _on_NewGame_button_down() -> void:
 	restart()
@@ -259,7 +255,7 @@ func _on_CreateTestMapButton_button_down() -> void:
 		create_block(numbers[randi() % 7],rand_block())
 		count -= 1
 		
-#创建即将胜利的块
+#创建即将胜利的地图
 func _on_CreateWinMapButton_button_down() -> void:
 	create_block(1024,Vector2(0,0))
 	create_block(1024,Vector2(0,1))
@@ -268,6 +264,31 @@ func _on_CreateWinMapButton_button_down() -> void:
 	for i in [0,1]:
 		create_block(1024,rand_block())
 
+#创建即将满足失败条件的地图
+func _on_CreateLoseMapButton_button_down() -> void:
+	#初始化
+	map.clear()
+	#初始化二维数组
+	for	_row in range(0,4,1):
+		map.append([0,0,0,0])
+	for block in $Blocks.get_children():
+		block.queue_free()
+	$GameController.score = "0"
+	game_over = false
+	$GameOver.visible = false
+	#保证有两个可以合成
+	var num = 2
+	for row in range(0,4,1):
+		for col in range(0,4,1):
+			create_block(num,Vector2(row,col))
+			if num == 1024:
+				num = 2
+			num = num * 2
+
+	map[0][0] = 4
+	var block = find_block(Vector2(0,0))
+	block.number = 4
 
 func _on_ShowDialogButton_button_down() -> void:
 	$GameOver.visible = !$GameOver.visible
+

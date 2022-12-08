@@ -87,7 +87,6 @@ position = Vector2( 256, 256 )
 current = true
 
 [node name="Debug" type="Node2D" parent="BackGround/Panel"]
-visible = false
 
 [node name="MapArray" type="Label" parent="BackGround/Panel/Debug"]
 margin_left = -707.0
@@ -113,6 +112,7 @@ margin_left = 602.0
 margin_top = -4.0
 margin_right = 796.0
 margin_bottom = 120.0
+mouse_default_cursor_shape = 2
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_fonts/font = SubResource( 10 )
 text = "创建地图"
@@ -122,15 +122,27 @@ margin_left = 609.0
 margin_top = 142.0
 margin_right = 789.0
 margin_bottom = 265.0
+mouse_default_cursor_shape = 2
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_fonts/font = SubResource( 10 )
-text = "1204*2"
+text = "胜利地图"
+
+[node name="CreateLoseMapButton" type="Button" parent="BackGround/Panel/Debug"]
+margin_left = 614.0
+margin_top = 309.0
+margin_right = 794.0
+margin_bottom = 432.0
+mouse_default_cursor_shape = 2
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 10 )
+text = "失败地图"
 
 [node name="ShowDialogButton" type="Button" parent="BackGround/Panel/Debug"]
-margin_left = 612.0
-margin_top = 303.0
-margin_right = 824.0
-margin_bottom = 414.0
+margin_left = 613.0
+margin_top = 464.0
+margin_right = 825.0
+margin_bottom = 575.0
+mouse_default_cursor_shape = 2
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_fonts/font = SubResource( 10 )
 text = "显示提示框"
@@ -254,6 +266,7 @@ text = "新游戏"
 [connection signal="button_down" from="BackGround/Panel/Debug/CreateBlockButton" to="." method="_on_Button_button_down"]
 [connection signal="button_down" from="BackGround/Panel/Debug/CreateTestMapButton" to="." method="_on_CreateTestMapButton_button_down"]
 [connection signal="button_down" from="BackGround/Panel/Debug/CreateWinMapButton" to="." method="_on_CreateWinMapButton_button_down"]
+[connection signal="button_down" from="BackGround/Panel/Debug/CreateLoseMapButton" to="." method="_on_CreateLoseMapButton_button_down"]
 [connection signal="button_down" from="BackGround/Panel/Debug/ShowDialogButton" to="." method="_on_ShowDialogButton_button_down"]
 [connection signal="button_down" from="BackGround/NewGame" to="." method="_on_NewGame_button_down"]
 [connection signal="button_down" from="GameOver/Button" to="." method="_on_NewGame_button_down"]

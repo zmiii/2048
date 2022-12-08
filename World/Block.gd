@@ -7,12 +7,6 @@ var point = Vector2(0,0)
 #是否已合并过
 var has_merge = false
 
-func _ready():
-	pass
-
-func _physics_process(delta):
-	pass
-
 func number_set(value):
 	number = value
 	$Number.text = String(number)
@@ -49,10 +43,9 @@ func move(var target:Vector2):
 		self.position, target, 0.1,
 		Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	$Tween.start()
-	yield(get_tree(),"idle_frame")
 
 #更改分数和新建时从小变大的效果
-#虽然新建时也会进入setter，但不知道为什么无效
+#虽然ready方法也会进入setter，但不知道为什么无效
 func show():
 	$Tween.interpolate_property(self, "scale",
 		self.scale, Vector2(0.8,0.8), 0.1,
