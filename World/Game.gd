@@ -61,6 +61,8 @@ func calculate(var dire):
 	#如果没有块移动跳过剩余计算且不生成块
 	if !has_move_block:
 		return
+	#移动完成后创建一个新块
+	create_block(2,rand_block())
 	#检测是否胜负
 	#如果返回false则不可以继续游玩
 	if !map_check():
@@ -68,8 +70,6 @@ func calculate(var dire):
 	#可以继续游玩则重置块合并状态
 	for block in $Blocks.get_children():
 		block.has_merge = false
-	#移动完成后创建一个新块
-	create_block(2,rand_block())
 
 func move(var row,var col,var dire:Vector2):
 	#如果当前为0则跳过 
@@ -120,9 +120,8 @@ func block_move(var block,var point : Vector2):
 
 #检查地图是否还能继续游玩
 func map_check():
-	#空余块计数器
-	var zero_count = 0
 	#优先检查一次是胜利或者还能继续
+	#如果有2048则结束、如果有0则继续、如果有相邻且相同的则继续
 	for row in range(0,4,1):
 		for col in range(0,4,1):
 			if map[row][col] == 2048:
@@ -130,19 +129,14 @@ func map_check():
 				game_over = true
 				return false
 			elif map[row][col] == 0:
-				zero_count += 1
-	if zero_count > 0:
-		return zero_count
-	
-	#满屏且没有胜利，则检查是否失败，未失败则继续游戏且不生成块
-	for row in range(0,4,1):
-		for col in range(0,4,1):
-			if !map_contrast(row,col):
-				$GameOver.visible = true
-				game_over = true
-				return false
-			else:
 				return true
+			elif map_contrast(row,col):
+				return true
+	
+	#如果没有胜利且满足继续游戏的条件则表示失败
+	$GameOver.visible = true
+	game_over = true
+	return false
 
 #地图节点对比查看四个方向是否有相邻且相同的块
 func map_contrast(var row,var col):

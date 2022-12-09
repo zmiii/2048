@@ -87,6 +87,7 @@ position = Vector2( 256, 256 )
 current = true
 
 [node name="Debug" type="Node2D" parent="BackGround/Panel"]
+visible = false
 
 [node name="MapArray" type="Label" parent="BackGround/Panel/Debug"]
 margin_left = -707.0
