@@ -35,8 +35,8 @@ func input_check():
 	elif Input.is_action_just_pressed("ui_right"):
 		calculate(BlockModel.blockDirection["RIGHT"])
 
-	if Input.is_action_just_pressed("ui_home"):
-		$BackGround/Panel/Debug.visible = !$BackGround/Panel/Debug.visible
+#	if Input.is_action_just_pressed("ui_home"):
+#		$BackGround/Panel/Debug.visible = !$BackGround/Panel/Debug.visible
 
 func calculate(var dire):
 	#重置移动指示器
